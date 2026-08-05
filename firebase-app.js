@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import {
-  getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult,
+  getAuth, GoogleAuthProvider, signInWithPopup,
   onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 import {
@@ -105,9 +105,15 @@ async function boot() {
   let cloudTimer = null;
   let ignoreLocal = false;
 
-  const login = () => signInWithRedirect(auth, provider);
+  const login = async () => {
+  try {
+    await signInWithPopup(auth, provider);
+  } catch (e) {
+    showGate("Login မအောင်မြင်ပါ", friendly(e), "", "login", login);
+  }
+};
   document.getElementById("fbLogin").onclick = login;
-  getRedirectResult(auth).catch(e => showGate("Login မအောင်မြင်ပါ", friendly(e), "", "login", login));
+  
 
   onAuthStateChanged(auth, async user => {
     session = {user, active:false, owner:false};
