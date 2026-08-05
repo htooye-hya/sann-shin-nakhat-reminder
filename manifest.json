@@ -1,0 +1,13 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "စန်းယှဉ်နက္ခတ် Reminder",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "စန်းယှဉ်နက္ခတ်",
+  "start_url": "/",
+  "theme_color": "#8a6500",
+  "id": "/sann-shin-nakhat-reminder/",
+  "description": "လက်ရှိစန်းယှဉ်နက္ခတ်၊ တာရာအကျိုးပေး၊ ရွတ်ဖတ်ရန်၊ ဆောင်ရွက်ရန်နှင့် Reminder များကို ပြသပေးသော မြန်မာ့ရိုးရာနက္ခတ် App"
+}
