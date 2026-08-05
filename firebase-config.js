@@ -8,4 +8,4 @@ export const firebaseConfig = {
   appId: "1:68562848974:web:ed7b07f741d2eaec75149f"
 };
 
-export const OWNER_UID = "";
+export const OWNER_UID = "xVM9fYao8uMZSTCoaaPnAWa6rJE3";
