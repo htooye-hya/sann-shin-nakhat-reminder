@@ -1,0 +1,1131 @@
+<!doctype html>
+<html lang="my">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#8a6500" />
+  <title>စန်းယှဉ်နက္ခတ် Reminder</title>
+  <style>
+    :root{
+      --gold:#9b7200;--gold2:#d8b044;--ink:#2e271c;--muted:#756b5a;
+      --paper:#fffdf7;--paper2:#f8f1df;--line:#e5d6ae;--ok:#256b42;
+      --warn:#9c5d00;--danger:#9b2f2f;--shadow:0 12px 35px rgba(83,57,0,.10);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;color:var(--ink);background:
+      radial-gradient(circle at 20% 0%,rgba(216,176,68,.18),transparent 32%),
+      linear-gradient(180deg,#fffaf0 0%,#f6edd9 100%);
+      font-family:"Noto Sans Myanmar","Pyidaungsu","Myanmar Text",system-ui,sans-serif;
+      min-height:100vh;
+    }
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:760px;margin:auto;min-height:100vh;padding-bottom:92px}
+    header{
+      position:sticky;top:0;z-index:20;padding:14px 16px 12px;
+      background:rgba(255,253,247,.94);backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(155,114,0,.18)
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+      color:#fff;background:linear-gradient(145deg,#c8991e,#765400);
+      box-shadow:0 5px 16px rgba(118,84,0,.25);font-size:23px
+    }
+    h1{font-size:18px;margin:0;line-height:1.45}
+    .subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+    .live-time{margin-left:auto;text-align:right;font-size:11px;color:var(--muted)}
+    .live-time strong{display:block;color:var(--gold);font-size:14px}
+    main{padding:14px}
+    .page{display:none;animation:fade .25s ease}
+    .page.active{display:block}
+    @keyframes fade{from{opacity:.35;transform:translateY(5px)}to{opacity:1;transform:none}}
+    .card{
+      background:rgba(255,253,247,.96);border:1px solid var(--line);border-radius:20px;
+      padding:16px;margin-bottom:14px;box-shadow:var(--shadow)
+    }
+    .hero{
+      background:
+      linear-gradient(145deg,rgba(98,68,0,.97),rgba(161,116,0,.92)),
+      radial-gradient(circle at 80% 10%,#f9de83,transparent 28%);
+      color:#fff;border:none;overflow:hidden;position:relative
+    }
+    .hero:after{
+      content:"☾";position:absolute;right:-4px;top:-38px;font-size:150px;
+      color:rgba(255,255,255,.08);transform:rotate(-18deg)
+    }
+    .eyebrow{font-size:12px;opacity:.82;letter-spacing:.3px}
+    .hero h2{font-size:28px;margin:8px 0 4px;position:relative;z-index:1}
+    .hero .meta{font-size:13px;opacity:.9}
+    .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px;position:relative;z-index:1}
+    .pill{
+      display:inline-flex;align-items:center;gap:6px;border-radius:999px;
+      background:rgba(255,255,255,.14);padding:7px 10px;font-size:12px;
+      border:1px solid rgba(255,255,255,.2)
+    }
+    .section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .section-title h3{font-size:16px;margin:0}
+    .section-title small{color:var(--muted)}
+    .status{
+      border-radius:16px;padding:14px;border-left:5px solid var(--gold);
+      background:#fff9e7;margin-top:12px
+    }
+    .status.good{border-color:var(--ok);background:#eef8f2}
+    .status.warn{border-color:var(--warn);background:#fff4e6}
+    .status.danger{border-color:var(--danger);background:#fff0ef}
+    .status h3{margin:0 0 6px;font-size:17px}
+    .status p{margin:4px 0;line-height:1.65;font-size:14px}
+    .countdown{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px
+    }
+    .countdown div{
+      text-align:center;padding:10px 6px;border-radius:13px;
+      background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)
+    }
+    .countdown b{display:block;font-size:18px}
+    .countdown span{font-size:10px;opacity:.8}
+    .progress{height:7px;background:rgba(255,255,255,.18);border-radius:99px;margin-top:12px;overflow:hidden}
+    .progress i{display:block;height:100%;background:#ffe39a;width:0%;border-radius:99px;transition:.5s}
+    .action-list{display:grid;gap:9px}
+    .check{
+      display:flex;gap:10px;align-items:flex-start;padding:11px;border:1px solid var(--line);
+      border-radius:14px;background:#fff
+    }
+    .check input{width:20px;height:20px;accent-color:var(--gold);flex:0 0 auto}
+    .check span{font-size:14px;line-height:1.55}
+    .chant{
+      padding:15px;border-radius:16px;background:linear-gradient(180deg,#fff9e8,#f7edcf);
+      border:1px solid #e3cd8c;line-height:1.8;font-size:15px;white-space:pre-wrap
+    }
+    .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .btn{
+      border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;
+      padding:10px 13px;font-weight:700;font-size:13px
+    }
+    .btn.primary{background:var(--gold);border-color:var(--gold);color:#fff}
+    .btn.soft{background:#fff9e8;color:#755600;border-color:#dfc87e}
+    .btn.danger{color:var(--danger);border-color:#edc4c4;background:#fff8f8}
+    .btn:active{transform:translateY(1px)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .metric{padding:13px;border-radius:15px;border:1px solid var(--line);background:#fff}
+    .metric small{display:block;color:var(--muted);margin-bottom:5px}
+    .metric b{font-size:16px}
+    label{display:block;font-weight:700;font-size:13px;margin:12px 0 6px}
+    input,select,textarea{
+      width:100%;border:1px solid #d9c79a;background:#fff;border-radius:12px;
+      padding:11px 12px;color:var(--ink);outline:none
+    }
+    input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(155,114,0,.10)}
+    textarea{min-height:82px;resize:vertical;line-height:1.55}
+    .hint{font-size:11px;color:var(--muted);line-height:1.55;margin-top:6px}
+    .switch-line{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0}
+    .switch{position:relative;width:48px;height:28px;flex:0 0 auto}
+    .switch input{opacity:0;width:0;height:0}
+    .slider{position:absolute;inset:0;border-radius:99px;background:#c9c1b2;transition:.2s}
+    .slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:#fff;transition:.2s}
+    .switch input:checked + .slider{background:var(--gold)}
+    .switch input:checked + .slider:before{transform:translateX(20px)}
+    .timeline{display:grid;gap:10px}
+    .time-item{
+      display:grid;grid-template-columns:54px 1fr auto;gap:10px;align-items:center;
+      padding:12px;border-radius:15px;border:1px solid var(--line);background:#fff
+    }
+    .time-item .num{
+      width:46px;height:46px;border-radius:14px;display:grid;place-items:center;
+      background:#f5ead0;color:var(--gold);font-weight:800
+    }
+    .time-item h4{margin:0 0 4px;font-size:14px}
+    .time-item p{margin:0;color:var(--muted);font-size:11px;line-height:1.5}
+    .tag{font-size:10px;border-radius:999px;padding:5px 7px;background:#f4ecd8;color:#775600;white-space:nowrap}
+    .rule-card{border:1px solid var(--line);border-radius:17px;margin-bottom:10px;background:#fff;overflow:hidden}
+    .rule-head{padding:13px;display:flex;align-items:center;gap:10px;cursor:pointer}
+    .rule-head .badge{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:#f4e7c4;color:#785800;font-weight:800}
+    .rule-head h4{margin:0;font-size:14px}
+    .rule-head p{margin:3px 0 0;font-size:11px;color:var(--muted)}
+    .rule-body{display:none;padding:0 13px 13px}
+    .rule-card.open .rule-body{display:block}
+    .rule-card.open .rule-head{background:#fffaec}
+    .nav{
+      position:fixed;z-index:30;bottom:0;left:50%;transform:translateX(-50%);
+      width:min(760px,100%);display:grid;grid-template-columns:repeat(4,1fr);
+      padding:7px 9px calc(7px + env(safe-area-inset-bottom));
+      background:rgba(255,253,247,.96);backdrop-filter:blur(15px);
+      border-top:1px solid var(--line)
+    }
+    .nav button{border:0;background:transparent;color:var(--muted);padding:7px 2px;border-radius:12px;font-size:10px}
+    .nav button span{display:block;font-size:21px;line-height:1.1;margin-bottom:3px}
+    .nav button.active{color:var(--gold);background:#f8eed4;font-weight:800}
+    .toast{
+      position:fixed;left:50%;bottom:92px;z-index:100;transform:translate(-50%,20px);
+      width:min(90%,520px);padding:12px 14px;border-radius:13px;background:#2f291f;color:#fff;
+      opacity:0;pointer-events:none;transition:.25s;text-align:center;font-size:13px
+    }
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .modal{position:fixed;inset:0;z-index:80;background:rgba(33,27,17,.52);display:none;align-items:flex-end;justify-content:center}
+    .modal.show{display:flex}
+    .sheet{width:min(760px,100%);max-height:91vh;overflow:auto;background:var(--paper);border-radius:24px 24px 0 0;padding:20px 16px calc(22px + env(safe-area-inset-bottom))}
+    .sheet h2{margin:0 0 8px;font-size:20px}
+    .notice{padding:12px;border-radius:13px;background:#f6f0e2;color:#655b49;font-size:12px;line-height:1.65;border:1px dashed #d6c290}
+    .hidden{display:none!important}
+    .empty{text-align:center;padding:25px 10px;color:var(--muted)}
+    .starline{text-align:center;color:#b78a19;letter-spacing:5px;margin:4px 0 14px}
+    @media(max-width:420px){
+      .grid-2{grid-template-columns:1fr}.hero h2{font-size:24px}
+      .time-item{grid-template-columns:48px 1fr}.time-item .tag{grid-column:2}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">☾</div>
+      <div>
+        <h1>စန်းယှဉ်နက္ခတ် Reminder</h1>
+        <div class="subtitle">လက်ရှိနက္ခတ် · ရွတ်ဖတ်ရန် · ဆောင်ရွက်ရန်</div>
+      </div>
+      <div class="live-time"><strong id="headerTime">--:--</strong><span id="headerDate">--</span></div>
+    </div>
+  </header>
+
+  <main>
+    <section id="todayPage" class="page active">
+      <div class="card hero">
+        <div class="eyebrow" id="welcomeText">ယနေ့ လက်ရှိစန်းယှဉ်နက္ခတ်</div>
+        <h2 id="currentNakName">တွက်ချက်နေသည်…</h2>
+        <div class="meta" id="currentMeta">—</div>
+        <div class="pill-row">
+          <span class="pill">မွေးနက္ခတ် <b id="birthNakPill">—</b></span>
+          <span class="pill">ဆက်စပ်ကိန်း <b id="taraCountPill">—</b></span>
+          <span class="pill">ပဒ် <b id="padaPill">—</b></span>
+        </div>
+        <div class="countdown">
+          <div><b id="cdH">--</b><span>နာရီ</span></div>
+          <div><b id="cdM">--</b><span>မိနစ်</span></div>
+          <div><b id="cdS">--</b><span>စက္ကန့်</span></div>
+        </div>
+        <div class="progress"><i id="nakProgress"></i></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <h3>ယခုအချိန် အကျိုးပေးသဘော</h3>
+          <small id="cycleLabel">—</small>
+        </div>
+        <div id="taraStatus" class="status">
+          <h3 id="taraTitle">—</h3>
+          <p id="taraMeaning">—</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <h3>စန်းယှဉ်နက္ခတ်နှင့် အဝတ်အစားအသစ်ဝတ်ဆင်ခြင်း</h3>
+          <small>ရိုးရာအဟော</small>
+        </div>
+        <div id="clothingStatus" class="status">
+          <h3 id="clothingNakName">—</h3>
+          <p id="clothingResult">—</p>
+        </div>
+        <p class="hint">လက်ရှိရောက်နေသော စန်းယှဉ်နက္ခတ်အလိုက် အဝတ်အစားအသစ် စတင်ဝတ်ဆင်ခြင်းဆိုင်ရာ ရိုးရာအဟောကို ပြထားသည်။</p>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <h3>ဆောင်ရွက်သင့်သောကိစ္စများ</h3>
+          <small id="doneCount">0/0</small>
+        </div>
+        <div id="actionList" class="action-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <h3>ရွတ်ဖတ်ရန်</h3>
+          <small>စိတ်ကြိုက်ပြင်နိုင်သည်</small>
+        </div>
+        <div class="chant" id="chantText">—</div>
+        <div class="btn-row">
+          <button class="btn primary" id="speakBtn">🔊 အသံဖြင့်ဖတ်</button>
+          <button class="btn soft" id="copyBtn">📋 ကူးယူ</button>
+          <button class="btn" id="completeBtn">✓ ရွတ်ဖတ်ပြီး</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title"><h3>သတိပြုရန်</h3></div>
+        <div class="notice" id="cautionText">—</div>
+        <div class="btn-row">
+          <button class="btn soft" id="calendarBtn">📅 နက္ခတ် Calendar ၃၀ အလှည့်ထည့်ရန်</button>
+          <button class="btn" id="refreshBtn">↻ ပြန်တွက်ရန်</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="schedulePage" class="page">
+      <div class="card">
+        <div class="section-title">
+          <h3>လာမည့် နက္ခတ်အလှည့်များ</h3>
+          <small>ခန့်မှန်းချိန်</small>
+        </div>
+        <div id="timeline" class="timeline"></div>
+      </div>
+      <div class="card notice">
+        လက်ရှိနှင့် လာမည့်နက္ခတ်အချိန်များကို လ၏ ပျမ်းမျှ/အနီးစပ်ဆုံး နက္ခတ္တဗေဒတွက်ချက်မှုဖြင့် ပြထားသည်။
+        ဆရာသုံးပြက္ခဒိန်နှင့် ကွာခြားပါက “ဆက်တင်” မှ လက်ရှိနက္ခတ်ကို လက်ဖြင့်ရွေးနိုင်သည်။
+      </div>
+    </section>
+
+    <section id="rulesPage" class="page">
+      <div class="card">
+        <div class="section-title"><h3>ဆက်စပ်နက္ခတ် စည်းမျဉ်း ၉ မျိုး</h3><small>ပြင်ဆင်နိုင်သည်</small></div>
+        <p class="hint">မွေးနက္ခတ်မှ လက်ရှိနက္ခတ်အထိ အပါအဝင်ရေတွက်ပြီး ၉ မျိုးစက်ဝန်းဖြင့် ပြသထားသည်။</p>
+      </div>
+      <div id="ruleEditor"></div>
+      <div class="btn-row">
+        <button class="btn primary" id="saveRulesBtn">စည်းမျဉ်းများ သိမ်းမည်</button>
+        <button class="btn danger" id="resetRulesBtn">မူလအတိုင်း ပြန်ထားမည်</button>
+      </div>
+    </section>
+
+    <section id="settingsPage" class="page">
+      <div class="card">
+        <div class="section-title"><h3>အသုံးပြုသူ အချက်အလက်</h3></div>
+        <label>အမည်</label>
+        <input id="setName" placeholder="ဥပမာ — ကိုထူးရဲအောင်" />
+
+        <label>မွေးနက္ခတ်သတ်မှတ်ပုံ</label>
+        <select id="birthMode">
+          <option value="manual">နက္ခတ်ကို လက်ဖြင့်ရွေးမည်</option>
+          <option value="auto">မွေးရက်/အချိန်မှ အလိုအလျောက်တွက်မည်</option>
+        </select>
+
+        <div id="manualBirthBox">
+          <label>မွေးစန်းယှဉ်နက္ခတ်</label>
+          <select id="setBirthNak"></select>
+        </div>
+
+        <div id="autoBirthBox" class="hidden">
+          <div class="grid-2">
+            <div><label>မွေးသက္ကရာဇ်</label><input type="date" id="birthDate" /></div>
+            <div><label>မွေးချိန်</label><input type="time" id="birthTime" value="12:00" /></div>
+          </div>
+          <label>အချိန်ဇုန်</label>
+          <select id="birthTimezone">
+            <option value="6.5">မြန်မာစံတော်ချိန် UTC+06:30</option>
+            <option value="5.5">အိန္ဒိယစံတော်ချိန် UTC+05:30</option>
+            <option value="7">ထိုင်းစံတော်ချိန် UTC+07:00</option>
+            <option value="0">UTC</option>
+          </select>
+          <div class="hint">မွေးချိန်မှ တွက်ချက်ခြင်းသည် အနီးစပ်ဆုံး နက္ခတ္တဗေဒတွက်ချက်မှု ဖြစ်သည်။</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title"><h3>လက်ရှိနက္ခတ် တွက်ချက်ပုံ</h3></div>
+        <select id="currentMode">
+          <option value="auto">လက်ရှိအချိန်မှ အလိုအလျောက်တွက်မည်</option>
+          <option value="manual">နက္ခတ်ကို လက်ဖြင့်ရွေးမည်</option>
+        </select>
+        <div id="manualCurrentBox" class="hidden">
+          <label>လက်ရှိစန်းယှဉ်နက္ခတ်</label>
+          <select id="setCurrentNak"></select>
+          <label>နောက်နက္ခတ်ပြောင်းမည့်အချိန်</label>
+          <input type="datetime-local" id="manualEndTime" />
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title"><h3>Reminder</h3></div>
+        <div class="switch-line">
+          <div><b>Browser Notification</b><div class="hint">App ဖွင့်ထားချိန်တွင် အချက်ပေးမည်</div></div>
+          <label class="switch"><input type="checkbox" id="notifyEnabled"><span class="slider"></span></label>
+        </div>
+        <div class="grid-2">
+          <div><label>မနက် Reminder</label><input type="time" id="reminderTime1" value="06:30" /></div>
+          <div><label>ည Reminder</label><input type="time" id="reminderTime2" value="19:00" /></div>
+        </div>
+        <div class="switch-line">
+          <div><b>နက္ခတ်ပြောင်းချိန် အချက်ပေး</b></div>
+          <label class="switch"><input type="checkbox" id="transitionNotify"><span class="slider"></span></label>
+        </div>
+        <button class="btn soft" id="permissionBtn">🔔 Notification ခွင့်တောင်းမည်</button>
+        <p class="hint">Chrome မှ တိုက်ရိုက်ဖွင့်ထားသော file:// ဖိုင်တွင် Notification ကန့်သတ်နိုင်သည်။ HTTPS Website/App အဖြစ်အသုံးပြုလျှင် ပိုကောင်းသည်။</p>
+      </div>
+
+      <div class="card">
+        <div class="section-title"><h3>ဒေတာထိန်းသိမ်းမှု</h3></div>
+        <div class="btn-row">
+          <button class="btn primary" id="saveSettingsBtn">ဆက်တင် သိမ်းမည်</button>
+          <button class="btn" id="exportBtn">Backup ထုတ်မည်</button>
+          <button class="btn" id="importBtn">Backup ပြန်သွင်းမည်</button>
+          <input type="file" id="importFile" accept=".json,application/json" class="hidden" />
+        </div>
+      </div>
+
+      <div class="card notice">
+        ဤ app သည် ရိုးရာနက္ခတ်ဗေဒင်ကို မှတ်တမ်းနှင့် reminder အဖြစ်အသုံးပြုရန် ဖြစ်သည်။
+        ကျန်းမာရေး၊ ဥပဒေ၊ ငွေကြေးဆိုင်ရာ အရေးကြီးဆုံးဖြတ်ချက်များအတွက် သက်ဆိုင်ရာပညာရှင်၏ အကြံဉာဏ်ကို အစားမထိုးပါ။
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav">
+    <button class="active" data-page="todayPage"><span>☾</span>ယနေ့</button>
+    <button data-page="schedulePage"><span>◷</span>အချိန်ဇယား</button>
+    <button data-page="rulesPage"><span>✦</span>စည်းမျဉ်း</button>
+    <button data-page="settingsPage"><span>⚙</span>ဆက်တင်</button>
+  </nav>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<div id="setupModal" class="modal">
+  <div class="sheet">
+    <div class="starline">✦ ✦ ✦</div>
+    <h2>စတင်အသုံးပြုရန်</h2>
+    <p class="hint">အမည်နှင့် မွေးစန်းယှဉ်နက္ခတ်ကို အရင်သတ်မှတ်ပါ။ နောက်ပိုင်း ဆက်တင်မှ ပြန်ပြင်နိုင်သည်။</p>
+    <label>အမည်</label>
+    <input id="firstName" placeholder="အသုံးပြုသူအမည်" />
+    <label>မွေးစန်းယှဉ်နက္ခတ်</label>
+    <select id="firstBirthNak"></select>
+    <button class="btn primary" style="width:100%;margin-top:16px" id="startBtn">စတင်မည်</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const NAKS = [
+    "အဿဝဏီ","ဘရဏီ","ကြတ္တိကာ","ရောဟဏီ","မိဂသီ","အဒြ",
+    "ပုဏ္ဏဖုသျှ","ဖုသျှ","အဿလိဿ","မာဃ","ပြုဗ္ဗာဖလဂုဏီ","ဥတြဖလဂုဏီ",
+    "ဟဿတ","စိတြ","သွာတိ","ဝိသာခါ","အနုရာဓ","ဇေဋ္ဌ",
+    "မူလ","ပြုဗ္ဗာသဠ်","ဥတြာသဠ်","သရဝဏ်","ဓနသိဒ္ဓ","သတ္တဘိသျှ",
+    "ပြုဗ္ဗာပုရပိုက်","ဥတြာပုရပိုက်","ရေဝတီ"
+  ];
+
+  const TARA_NAMES = [
+    "ဇနမတာရာ","သမ္ပတ္တိတာရာ","ဝိပ္ပတ္တိတာရာ","ခေမတာရာ","ပြတ္တရတာရာ",
+    "သာဓကတာရာ","ဘာဓတာရာ","မိတ္တတာရာ","အတိမိတ္တတာရာ"
+  ];
+
+  const TARA_KEYS = [
+    "ဇနမ","သမ္ပတ္တိ","ဝိပ္ပတ္တိ","ခေမ","ပြတ္တရ",
+    "သာဓက","ဘာဓ","မိတ္တ","အတိမိတ္တ"
+  ];
+
+  const CLOTHING_RESULTS = [
+    "နောက်ထပ်အဝတ်အစားကောင်းများ ရရှိဝတ်ဆင်ရမည်။",
+    "အဝတ်အစားများ ခိုးယူခံရခြင်း၊ ပျောက်ဆုံးခြင်းရှိမည်။",
+    "အဝတ်အစားများ မီးလောင်ကျွမ်းမည်။",
+    "စည်းစိမ်ဥစ္စာ ကြွယ်ဝချမ်းသာမည်။",
+    "အဝတ်အစားများတွင် သန်းထူမည်။",
+    "ဆင်းရဲမည်။",
+    "မင်္ဂလာပွဲများ ဆင်ယင်ကျင်းပရမည်။",
+    "စည်းစိမ်ဥစ္စာ ရရှိမည်။",
+    "အဝတ်အစားများ ပျက်စီးမည်။",
+    "သေဆုံးတတ်၏။",
+    "မင်းဘေးသင့်တတ်၏။",
+    "ငွေကြေးများ ရရှိတတ်၏။",
+    "အလုပ်များ ပြီးစီးအောင်မြင်လိမ့်မည်။",
+    "ကောင်းသောအမှုကိစ္စများ ပြုလုပ်ရတတ်သည်။",
+    "စားကောင်းသောက်ဖွယ်များ စားသောက်ရမည်။",
+    "ထင်ရှားကျော်ကြားမည်။",
+    "မိတ်ဆွေများနှင့်တွေ့ရမည်။ မိတ်ဆွေကောင်းများ ရရှိမည်။",
+    "အဝတ်အထည်များ ပျောက်ဆုံးတတ်၏။",
+    "အဝတ်အထည်များ ရေတွင်ကျပျောက်တတ်၏။",
+    "အနာရောဂါ ထူပြောလိမ့်မည်။",
+    "အဖိုးတန် စားကောင်းသောက်ဖွယ်များ စားရမည်။",
+    "မျက်စိရောဂါများ ဖြစ်ပွားမည်။",
+    "ကောက်ပဲသီးနှံများ ရရှိလိမ့်မည်။",
+    "အဆိပ်ဘေး သင့်တတ်သည်။",
+    "ရေဘေးအန္တရာယ် ရှိလိမ့်မည်။",
+    "သားတစ်ယောက် မွေးဖွားလိမ့်မည်။",
+    "ကျောက်မျက်ရတနာများ ရရှိလိမ့်မည်။"
+  ];
+
+  const CLOTHING_TONES = [
+    "good","danger","danger","good","warn","danger","good","good","danger",
+    "danger","danger","good","good","good","good","good","good","danger",
+    "danger","danger","good","danger","good","danger","danger","good","good"
+  ];
+
+  const DEFAULT_RULES = [
+    {
+      key:"ဇနမ", title:"ဇနမတာရာ", tone:"warn",
+      meaning:"ကိုယ်စိတ်အခြေအနေ၊ မိသားစုနှင့် မူလကိစ္စများကို ပြန်လည်သုံးသပ်ရန် သင့်တော်သောအလှည့်။",
+      actions:["မပြီးသေးသော ကိုယ်ရေးကိစ္စများကို စနစ်တကျပြီးစီးပါ","ကျန်းမာရေးနှင့် အနားယူချိန်ကို ဦးစားပေးပါ","အရေးကြီးဆုံးဖြတ်ချက်ကို အချက်အလက်ပြည့်စုံမှ ချပါ"],
+      chant:"နမောတဿ ဘဂဝတော အရဟတော သမ္မာသမ္ဗုဒ္ဓဿ — ၃ ကြိမ်\nဣတိပိသော ဘဂဝါ… — ၉ ကြိမ်\nပြီးလျှင် မိမိနှင့် မိသားစုအား မေတ္တာပို့ပါ။",
+      caution:"စိတ်လှုပ်ရှားချိန်တွင် အလျင်စလိုဆုံးဖြတ်ခြင်းနှင့် မလိုအပ်သော ပဋိပက္ခကို ရှောင်ပါ။"
+    },
+    {
+      key:"သမ္ပတ္တိ", title:"သမ္ပတ္တိတာရာ", tone:"good",
+      meaning:"ဝင်ငွေ၊ ပစ္စည်း၊ အရောင်းအဝယ်နှင့် အကျိုးအမြတ်ကိစ္စများကို အာရုံစိုက်နိုင်သောအလှည့်။",
+      actions:["ငွေစာရင်း၊ ပစ္စည်းစာရင်းနှင့် အကြွေးစာရင်း စစ်ဆေးပါ","သေချာတွက်ချက်ထားသော အရောင်းအဝယ်ကို ဆောင်ရွက်ပါ","တန်ဖိုးတိုးစေမည့် အလုပ်ကို ဦးစားပေးပါ"],
+      chant:"နမောတဿ — ၃ ကြိမ်\nသဗ္ဗေ သတ္တာ အဝေရာ ဟောန္တု — ၉ ကြိမ်\nရရှိသောအကျိုးကို မျှတစွာအသုံးချမည်ဟု အဓိဋ္ဌာန်ပြုပါ။",
+      caution:"အမြတ်မြင်ပြီး အန္တရာယ်နှင့် စာချုပ်အချက်အလက်ကို မျက်ကွယ်မပြုပါနှင့်။"
+    },
+    {
+      key:"ဝိပ္ပတ္တိ", title:"ဝိပ္ပတ္တိတာရာ", tone:"danger",
+      meaning:"အနှောင့်အယှက်၊ ခရီး၊ စက်ပစ္စည်းနှင့် အလျင်စလိုလုပ်ဆောင်မှုများတွင် သတိပိုထားရမည့်အလှည့်။",
+      actions:["ယာဉ်၊ စက်ကိရိယာနှင့် လုံခြုံရေးကို နှစ်ကြိမ်စစ်ပါ","ခရီးနှင့် အန္တရာယ်ရှိသောအလုပ်ကို အချိန်ပိုထားစီစဉ်ပါ","အရေးမကြီးသော စွန့်စားမှုကို ရွှေ့ဆိုင်းပါ"],
+      chant:"နမောတဿ — ၃ ကြိမ်\nမေတ္တသုတ် သို့မဟုတ် မောရသုတ်ကို ရွတ်ဖတ်ပါ။\nသတ္တဝါအားလုံး ဘေးကင်းကြပါစေဟု မေတ္တာပို့ပါ။",
+      caution:"အန္တရာယ်ရှိသောနေရာ၊ အမြန်မောင်းနှင်မှု၊ စကားများခြင်းနှင့် စာချုပ်မဖတ်ဘဲ လက်မှတ်ထိုးခြင်းကို ရှောင်ပါ။"
+    },
+    {
+      key:"ခေမ", title:"ခေမတာရာ", tone:"good",
+      meaning:"အေးချမ်းရေး၊ ပြုပြင်ထိန်းသိမ်းရေး၊ ကုသရေးနှင့် အိမ်ထောင်စုကိစ္စများအတွက် အဆင်ပြေသောအလှည့်။",
+      actions:["အိမ်၊ လုပ်ငန်းခွင်နှင့် ပစ္စည်းများကို ပြုပြင်ထိန်းသိမ်းပါ","ဆက်ဆံရေးပျက်ကွက်မှုများကို အေးဆေးညှိနှိုင်းပါ","ကျန်းမာရေးကောင်းမွန်စေမည့် အလေ့အထကို စတင်ပါ"],
+      chant:"နမောတဿ — ၃ ကြိမ်\nဗုဒ္ဓံ သရဏံ ဂစ္ဆာမိ… သရဏဂုံ ၃ ပါးကို ရွတ်ဖတ်ပါ။\nအိမ်သူအိမ်သားများအား မေတ္တာပို့ပါ။",
+      caution:"အေးချမ်းနေချိန်ကို ပျင်းရိမှုအဖြစ် မပြောင်းစေဘဲ လိုအပ်သောအလုပ်ကို ပြီးစီးပါ။"
+    },
+    {
+      key:"ပြတ္တရ", title:"ပြတ္တရတာရာ", tone:"danger",
+      meaning:"အတိုက်အခံ၊ အငြင်းပွားမှုနှင့် ခွင့်ပြုချက်/စာရွက်စာတမ်း အတားအဆီးများ ပိုတွေ့နိုင်သောအလှည့်။",
+      actions:["စာရွက်စာတမ်းနှင့် သက်သေခံချက်ကို သေချာစစ်ပါ","တုံ့ပြန်မီ တစ်ကြိမ်ရပ်၍ အေးဆေးစဉ်းစားပါ","အငြင်းပွားမှုကို တတိယပုဂ္ဂိုလ်ဖြင့် ညှိနှိုင်းပါ"],
+      chant:"နမောတဿ — ၃ ကြိမ်\nခန္တီ ပရမံ တပေါ တီတိက္ခာ — ၉ ကြိမ်\nရန်သူမရှိ၊ အားလုံးအပေါ် မေတ္တာထားနိုင်ပါစေဟု ဆုတောင်းပါ။",
+      caution:"ဒေါသဖြင့်စာပြန်ခြင်း၊ လူရှေ့တွင် အပြစ်တင်ခြင်းနှင့် အာဏာပြိုင်ဆိုင်မှုကို ရှောင်ပါ။"
+    },
+    {
+      key:"သာဓက", title:"သာဓကတာရာ", tone:"good",
+      meaning:"ရည်မှန်းချက်၊ လျှောက်လွှာ၊ စာမေးပွဲ၊ စီမံကိန်းနှင့် လုပ်ငန်းပြီးမြောက်ရေးအတွက် အားကောင်းသောအလှည့်။",
+      actions:["အရေးကြီးဆုံးလုပ်ငန်းတစ်ခုကို ရွေးပြီး အပြီးသတ်ပါ","လျှောက်လွှာ၊ တင်ပြချက်နှင့် အစီရင်ခံစာ ပို့ပါ","ပညာသင်ယူမှုနှင့် ကျွမ်းကျင်မှုတိုးတက်ရေး လုပ်ပါ"],
+      chant:"နမောတဿ — ၃ ကြိမ်\nအပ္ပမာဒေန သမ္ပာဒေထ — ၉ ကြိမ်\nကောင်းသောရည်မှန်းချက် ပြီးမြောက်ပါစေဟု အဓိဋ္ဌာန်ပြုပါ။",
+      caution:"အလုပ်များစွာကို တစ်ပြိုင်နက်စတင်မည့်အစား အဓိကတစ်ခုကို အပြီးလုပ်ပါ။"
+    },
+    {
+      key:"ဘာဓ", title:"ဘာဓတာရာ", tone:"danger",
+      meaning:"ဆုံးရှုံးမှုနှင့် အားနည်းချက်ကို ကြိုတင်ကာကွယ်၍ အဟောင်းရှင်းလင်းခြင်း၊ အန္တရာယ်လျှော့ချခြင်း ပြုရမည့်အလှည့်။",
+      actions:["ငွေ၊ ဒေတာနှင့် စာရွက်စာတမ်း Backup ပြုလုပ်ပါ","ပျက်စီးနိုင်သောပစ္စည်းနှင့် လုံခြုံရေး စစ်ဆေးပါ","မဖြစ်မနေမဟုတ်သော အကြီးစားစတင်မှုကို ရွှေ့ဆိုင်းပါ"],
+      chant:"နမောတဿ — ၃ ကြိမ်\nရတနသုတ် သို့မဟုတ် မင်္ဂလသုတ်ကို ရွတ်ဖတ်ပါ။\nမကောင်းမှုရှောင်၍ ကောင်းမှုဆောင်မည်ဟု အဓိဋ္ဌာန်ပြုပါ။",
+      caution:"အကြီးစားရင်းနှီးမြှုပ်နှံမှု၊ အန္တရာယ်ကြီးခရီးနှင့် စိတ်ဆိုးနေချိန်ဆုံးဖြတ်ချက်ကို အထူးရှောင်ပါ။"
+    },
+    {
+      key:"မိတ္တ", title:"မိတ္တတာရာ", tone:"good",
+      meaning:"မိတ်ဆွေ၊ အဖွဲ့အစည်း၊ ပူးပေါင်းဆောင်ရွက်မှုနှင့် ဆွေးနွေးညှိနှိုင်းမှုအတွက် သင့်တော်သောအလှည့်။",
+      actions:["လိုအပ်သောသူနှင့် ဆက်သွယ်၍ ပူးပေါင်းမှုတည်ဆောက်ပါ","မိတ်ဟောင်းဆွေဟောင်းများကို ပြန်လည်ဆက်သွယ်ပါ","အဖွဲ့လိုက်လုပ်ငန်းနှင့် ညှိနှိုင်းအစည်းအဝေး လုပ်ပါ"],
+      chant:"နမောတဿ — ၃ ကြိမ်\nသဗ္ဗေ သတ္တာ သုခီ ဟောန္တု — ၉ ကြိမ်\nမိတ်ဆွေအားလုံး ချမ်းသာကြပါစေဟု မေတ္တာပို့ပါ။",
+      caution:"မိတ်ဆွေဖြစ်သော်လည်း ငွေကြေးနှင့် တာဝန်ခွဲဝေမှုကို စာဖြင့်ရှင်းလင်းထားပါ။"
+    },
+    {
+      key:"အတိမိတ္တ", title:"အတိမိတ္တတာရာ", tone:"good",
+      meaning:"ကူညီပံ့ပိုးမှု၊ မင်္ဂလာ၊ လူမှုဆက်ဆံရေးနှင့် ကောင်းသောစတင်မှုများအတွက် အလွန်အထောက်အကူပြုသောအလှည့်။",
+      actions:["အရေးကြီးတွေ့ဆုံမှုနှင့် မိတ်ဖက်ဆွေးနွေးမှု ဆောင်ရွက်ပါ","ကောင်းစွာပြင်ဆင်ထားသော စီမံကိန်းကို စတင်ပါ","အလှူဒါန၊ ကူညီမှုနှင့် ကောင်းမှုကုသိုလ် ပြုပါ"],
+      chant:"နမောတဿ — ၃ ကြိမ်\nမင်္ဂလသုတ်ကို ရွတ်ဖတ်ပါ။\nရရှိသောအခွင့်အရေးကို အများအကျိုးနှင့် မိမိအကျိုးအတွက် မှန်ကန်စွာအသုံးချမည်ဟု အဓိဋ္ဌာန်ပြုပါ။",
+      caution:"အခြေအနေကောင်းသော်လည်း စည်းကမ်း၊ အချိန်နှင့် ကတိကဝတ်ကို မပေါ့ဆပါနှင့်။"
+    }
+  ];
+
+  const $ = id => document.getElementById(id);
+  const clamp = (n,a,b) => Math.max(a,Math.min(b,n));
+  const norm = x => ((x % 360) + 360) % 360;
+  const rad = d => d * Math.PI / 180;
+  const fmt2 = n => String(n).padStart(2,"0");
+  const STORE_KEY = "sanYinNakhatReminder_v1";
+
+  let timers = [];
+  let state = loadState();
+  let calc = null;
+
+  function defaultState(){
+    return {
+      profile:{name:"",birthMode:"manual",birthNak:0,birthDate:"",birthTime:"12:00",timezone:6.5},
+      current:{mode:"auto",manualNak:0,manualEnd:""},
+      reminders:{enabled:false,time1:"06:30",time2:"19:00",transition:true},
+      rules:JSON.parse(JSON.stringify(DEFAULT_RULES)),
+      completion:{},
+      setup:false
+    };
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORE_KEY);
+      if(!raw) return defaultState();
+      const saved = JSON.parse(raw);
+      const base = defaultState();
+      const loadedRules = Array.isArray(saved.rules)&&saved.rules.length===9?saved.rules:base.rules;
+      const correctedRules = loadedRules.map((r,i)=>({
+        ...r,
+        key:TARA_KEYS[i],
+        title:TARA_NAMES[i]
+      }));
+      return {
+        ...base,...saved,
+        profile:{...base.profile,...(saved.profile||{})},
+        current:{...base.current,...(saved.current||{})},
+        reminders:{...base.reminders,...(saved.reminders||{})},
+        rules:correctedRules,
+        completion:saved.completion||{}
+      };
+    }catch(e){ return defaultState(); }
+  }
+
+  function saveState(){
+    localStorage.setItem(STORE_KEY,JSON.stringify(state));
+    try{
+      window.dispatchEvent(new CustomEvent("sanYinLocalStateChanged",{
+        detail:JSON.parse(JSON.stringify(state))
+      }));
+    }catch(e){}
+  }
+
+  function toast(msg){
+    $("toast").textContent=msg;
+    $("toast").classList.add("show");
+    clearTimeout(toast.t);
+    toast.t=setTimeout(()=>$("toast").classList.remove("show"),2300);
+  }
+
+  function fillNakSelect(select){
+    select.innerHTML=NAKS.map((n,i)=>`<option value="${i}">${i+1}။ ${n}</option>`).join("");
+  }
+
+  ["setBirthNak","setCurrentNak","firstBirthNak"].forEach(id=>fillNakSelect($(id)));
+
+  function julianDay(date){
+    return date.getTime()/86400000 + 2440587.5;
+  }
+
+  function yearFraction(date){
+    const y=date.getUTCFullYear();
+    const start=Date.UTC(y,0,1), end=Date.UTC(y+1,0,1);
+    return y+(date.getTime()-start)/(end-start);
+  }
+
+  // Truncated lunar longitude series; adequate for an offline reminder estimate.
+  function moonSiderealLongitude(date){
+    const JD=julianDay(date);
+    const T=(JD-2451545.0)/36525;
+    const Lp=norm(218.3164477 + 481267.88123421*T - 0.0015786*T*T + T*T*T/538841 - T*T*T*T/65194000);
+    const D =norm(297.8501921 + 445267.1114034*T - 0.0018819*T*T + T*T*T/545868 - T*T*T*T/113065000);
+    const M =norm(357.5291092 + 35999.0502909*T - 0.0001536*T*T + T*T*T/24490000);
+    const Mp=norm(134.9633964 + 477198.8675055*T + 0.0087414*T*T + T*T*T/69699 - T*T*T*T/14712000);
+    const F =norm(93.2720950 + 483202.0175233*T - 0.0036539*T*T - T*T*T/3526000 + T*T*T*T/863310000);
+    const lon = Lp
+      + 6.289*Math.sin(rad(Mp))
+      + 1.274*Math.sin(rad(2*D-Mp))
+      + 0.658*Math.sin(rad(2*D))
+      + 0.214*Math.sin(rad(2*Mp))
+      - 0.186*Math.sin(rad(M))
+      - 0.114*Math.sin(rad(2*F))
+      + 0.059*Math.sin(rad(2*D-2*Mp))
+      + 0.057*Math.sin(rad(2*D-M-Mp))
+      + 0.053*Math.sin(rad(2*D+Mp))
+      + 0.046*Math.sin(rad(2*D-M))
+      + 0.041*Math.sin(rad(M-Mp))
+      - 0.035*Math.sin(rad(D))
+      - 0.031*Math.sin(rad(M+Mp))
+      - 0.015*Math.sin(rad(2*F-2*D))
+      + 0.011*Math.sin(rad(Mp-4*D));
+    const yf=yearFraction(date);
+    const ayanamsa=23.8530556 + 0.013968878*(yf-2000);
+    return norm(lon-ayanamsa);
+  }
+
+  function nakInfoAt(date){
+    const lon=moonSiderealLongitude(date);
+    const size=360/27;
+    const idx=Math.floor(lon/size);
+    const within=lon-idx*size;
+    const pada=Math.floor(within/(size/4))+1;
+    return {lon,idx,pada,progress:within/size};
+  }
+
+  function findTransition(fromDate, forcedIndex=null){
+    if(forcedIndex!==null && state.current.mode==="manual"){
+      const t=state.current.manualEnd?new Date(state.current.manualEnd):new Date(fromDate.getTime()+24*3600000);
+      return isNaN(t)?new Date(fromDate.getTime()+24*3600000):t;
+    }
+    const startIdx=nakInfoAt(fromDate).idx;
+    let lo=fromDate.getTime(), hi=lo+40*3600000;
+    let found=false;
+    for(let t=lo+30*60000;t<=hi;t+=30*60000){
+      if(nakInfoAt(new Date(t)).idx!==startIdx){hi=t;found=true;break;}
+    }
+    if(!found) return new Date(lo+24*3600000);
+    lo=hi-30*60000;
+    for(let i=0;i<22;i++){
+      const mid=(lo+hi)/2;
+      if(nakInfoAt(new Date(mid)).idx===startIdx) lo=mid; else hi=mid;
+    }
+    return new Date(hi);
+  }
+
+  function birthDateToUTC(){
+    const d=state.profile.birthDate, t=state.profile.birthTime||"12:00";
+    if(!d) return null;
+    const [y,m,day]=d.split("-").map(Number);
+    const [hh,mm]=t.split(":").map(Number);
+    const utc=Date.UTC(y,m-1,day,hh,mm)-Number(state.profile.timezone||6.5)*3600000;
+    return new Date(utc);
+  }
+
+  function effectiveBirthNak(){
+    if(state.profile.birthMode==="auto"){
+      const d=birthDateToUTC();
+      if(d && !isNaN(d)) return nakInfoAt(d).idx;
+    }
+    return Number(state.profile.birthNak)||0;
+  }
+
+  function currentInfo(now=new Date()){
+    if(state.current.mode==="manual"){
+      const idx=Number(state.current.manualNak)||0;
+      const end=findTransition(now,idx);
+      const total=24*3600000;
+      const left=Math.max(0,end-now);
+      return {idx,pada:0,progress:clamp(1-left/total,0,1),end,lon:null,manual:true};
+    }
+    const info=nakInfoAt(now);
+    return {...info,end:findTransition(now),manual:false};
+  }
+
+  function taraFor(birthIdx,currentIdx){
+    const count=((currentIdx-birthIdx+27)%27)+1;
+    const taraIdx=(count-1)%9;
+    const cycle=Math.floor((count-1)/9)+1;
+    return {count,taraIdx,cycle,rule:state.rules[taraIdx]};
+  }
+
+  function formatDateTime(d){
+    try{
+      return new Intl.DateTimeFormat("my-MM",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}).format(d);
+    }catch(e){return d.toLocaleString();}
+  }
+
+  function formatDate(d){
+    try{return new Intl.DateTimeFormat("my-MM",{year:"numeric",month:"long",day:"numeric",weekday:"long"}).format(d)}
+    catch(e){return d.toLocaleDateString()}
+  }
+
+  function updateClock(){
+    const now=new Date();
+    $("headerTime").textContent=`${fmt2(now.getHours())}:${fmt2(now.getMinutes())}`;
+    $("headerDate").textContent=formatDate(now);
+    if(calc){
+      const left=Math.max(0,calc.end-now);
+      $("cdH").textContent=fmt2(Math.floor(left/3600000));
+      $("cdM").textContent=fmt2(Math.floor(left%3600000/60000));
+      $("cdS").textContent=fmt2(Math.floor(left%60000/1000));
+      if(left<=1000) renderAll();
+    }
+  }
+
+  function completionKey(taraIdx,currentIdx){
+    const d=new Date();
+    return `${d.getFullYear()}-${fmt2(d.getMonth()+1)}-${fmt2(d.getDate())}-${taraIdx}-${currentIdx}`;
+  }
+
+  function renderToday(){
+    const now=new Date();
+    calc=currentInfo(now);
+    const birthIdx=effectiveBirthNak();
+    const tara=taraFor(birthIdx,calc.idx);
+    const rule=tara.rule;
+    const key=completionKey(tara.taraIdx,calc.idx);
+    const completed=state.completion[key]||{actions:[],chant:false};
+
+    $("welcomeText").textContent=state.profile.name?`${state.profile.name} အတွက် ယခုလက်ရှိစန်းယှဉ်နက္ခတ်`:"ယနေ့ လက်ရှိစန်းယှဉ်နက္ခတ်";
+    $("currentNakName").textContent=NAKS[calc.idx];
+    $("currentMeta").textContent=`${calc.manual?"လက်ဖြင့်သတ်မှတ်ထားသည်":"အလိုအလျောက်ခန့်မှန်းတွက်ချက်ထားသည်"} · ${formatDateTime(now)}`;
+    $("birthNakPill").textContent=NAKS[birthIdx];
+    $("taraCountPill").textContent=`${tara.count} လုံးမြောက်`;
+    $("padaPill").textContent=calc.pada?`${calc.pada}`:"—";
+    $("nakProgress").style.width=`${Math.round(calc.progress*100)}%`;
+    $("cycleLabel").textContent=`စက်ဝန်း ${tara.cycle} · အမှတ် ${tara.taraIdx+1}/၉`;
+
+    $("taraStatus").className=`status ${rule.tone||""}`;
+    $("taraTitle").textContent=rule.title;
+    $("taraMeaning").textContent=rule.meaning;
+
+    $("clothingStatus").className=`status ${CLOTHING_TONES[calc.idx]||"warn"}`;
+    $("clothingNakName").textContent=`${NAKS[calc.idx]}နက္ခတ်`;
+    $("clothingResult").textContent=CLOTHING_RESULTS[calc.idx];
+
+    $("actionList").innerHTML=rule.actions.map((a,i)=>`
+      <label class="check">
+        <input type="checkbox" data-action="${i}" ${completed.actions.includes(i)?"checked":""}>
+        <span>${escapeHtml(a)}</span>
+      </label>`).join("");
+    $("chantText").textContent=rule.chant;
+    $("cautionText").textContent=rule.caution;
+
+    const done=completed.actions.length;
+    $("doneCount").textContent=`${done}/${rule.actions.length}`;
+    $("completeBtn").textContent=completed.chant?"✓ ရွတ်ဖတ်ပြီးပါပြီ":"✓ ရွတ်ဖတ်ပြီး";
+    $("completeBtn").classList.toggle("primary",!!completed.chant);
+
+    document.querySelectorAll("[data-action]").forEach(el=>{
+      el.onchange=()=>{
+        const idx=Number(el.dataset.action);
+        const c=state.completion[key]||{actions:[],chant:false};
+        c.actions=el.checked?[...new Set([...c.actions,idx])]:c.actions.filter(x=>x!==idx);
+        state.completion[key]=c; saveState(); renderToday();
+      };
+    });
+  }
+
+  function estimateWindows(count=8){
+    const out=[];
+    let cursor=new Date();
+    let idx=currentInfo(cursor).idx;
+    let start=cursor;
+    for(let n=0;n<count;n++){
+      let end;
+      if(n===0){
+        end=currentInfo(start).end;
+      }else{
+        const probe=new Date(start.getTime()+5*60000);
+        idx=nakInfoAt(probe).idx;
+        end=findTransition(probe);
+      }
+      const birth=effectiveBirthNak();
+      const tara=taraFor(birth,idx);
+      out.push({idx,start:new Date(start),end:new Date(end),tara});
+      start=new Date(end.getTime()+1000);
+    }
+    return out;
+  }
+
+  function renderTimeline(){
+    const rows=estimateWindows(8);
+    $("timeline").innerHTML=rows.map((r,i)=>`
+      <div class="time-item">
+        <div class="num">${r.idx+1}</div>
+        <div>
+          <h4>${escapeHtml(NAKS[r.idx])}</h4>
+          <p>${i===0?"ယခုမှ":formatDateTime(r.start)} — ${formatDateTime(r.end)}</p>
+          <p>${escapeHtml(r.tara.rule.title)}</p>
+        </div>
+        <span class="tag">${r.tara.count} လုံးမြောက်</span>
+      </div>`).join("");
+  }
+
+  function escapeHtml(s){
+    return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+  }
+
+  function renderRules(){
+    $("ruleEditor").innerHTML=state.rules.map((r,i)=>`
+      <div class="rule-card" data-rule-card="${i}">
+        <div class="rule-head">
+          <div class="badge">${i+1}</div>
+          <div><h4>${escapeHtml(r.title)}</h4><p>${escapeHtml(r.key)} · ${r.tone==="good"?"အထောက်အကူ":r.tone==="danger"?"အထူးသတိ":"သတိနှင့်ဆောင်ရွက်"}</p></div>
+        </div>
+        <div class="rule-body">
+          <label>တာရာအမည်</label><input data-field="title" value="${escapeHtml(r.title)}" readonly>
+          <label>အဓိပ္ပာယ်</label><textarea data-field="meaning">${escapeHtml(r.meaning)}</textarea>
+          <label>ဆောင်ရွက်ရန် (တစ်ကြောင်းတစ်ချက်)</label><textarea data-field="actions">${escapeHtml(r.actions.join("\n"))}</textarea>
+          <label>ရွတ်ဖတ်ရန်</label><textarea data-field="chant">${escapeHtml(r.chant)}</textarea>
+          <label>သတိပြုရန်</label><textarea data-field="caution">${escapeHtml(r.caution)}</textarea>
+          <label>အခြေအနေအရောင်</label>
+          <select data-field="tone">
+            <option value="good" ${r.tone==="good"?"selected":""}>ကောင်း — အစိမ်း</option>
+            <option value="warn" ${r.tone==="warn"?"selected":""}>သတိ — အဝါ</option>
+            <option value="danger" ${r.tone==="danger"?"selected":""}>အထူးသတိ — အနီ</option>
+          </select>
+        </div>
+      </div>`).join("");
+    document.querySelectorAll(".rule-head").forEach(h=>h.onclick=()=>h.parentElement.classList.toggle("open"));
+  }
+
+  function populateSettings(){
+    $("setName").value=state.profile.name||"";
+    $("birthMode").value=state.profile.birthMode;
+    $("setBirthNak").value=state.profile.birthNak;
+    $("birthDate").value=state.profile.birthDate||"";
+    $("birthTime").value=state.profile.birthTime||"12:00";
+    $("birthTimezone").value=String(state.profile.timezone??6.5);
+    $("currentMode").value=state.current.mode;
+    $("setCurrentNak").value=state.current.manualNak;
+    $("manualEndTime").value=state.current.manualEnd||"";
+    $("notifyEnabled").checked=!!state.reminders.enabled;
+    $("transitionNotify").checked=!!state.reminders.transition;
+    $("reminderTime1").value=state.reminders.time1||"06:30";
+    $("reminderTime2").value=state.reminders.time2||"19:00";
+    toggleModeBoxes();
+  }
+
+  function toggleModeBoxes(){
+    $("manualBirthBox").classList.toggle("hidden",$("birthMode").value!=="manual");
+    $("autoBirthBox").classList.toggle("hidden",$("birthMode").value!=="auto");
+    $("manualCurrentBox").classList.toggle("hidden",$("currentMode").value!=="manual");
+  }
+
+  function renderAll(){
+    renderToday(); renderTimeline(); renderRules(); populateSettings(); scheduleNotifications();
+  }
+
+  function switchPage(id){
+    document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
+    document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+    if(id==="schedulePage") renderTimeline();
+    if(id==="rulesPage") renderRules();
+    if(id==="settingsPage") populateSettings();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>switchPage(b.dataset.page));
+  $("birthMode").onchange=toggleModeBoxes;
+  $("currentMode").onchange=toggleModeBoxes;
+
+  $("saveSettingsBtn").onclick=()=>{
+    state.profile={
+      name:$("setName").value.trim(),
+      birthMode:$("birthMode").value,
+      birthNak:Number($("setBirthNak").value),
+      birthDate:$("birthDate").value,
+      birthTime:$("birthTime").value||"12:00",
+      timezone:Number($("birthTimezone").value)
+    };
+    state.current={
+      mode:$("currentMode").value,
+      manualNak:Number($("setCurrentNak").value),
+      manualEnd:$("manualEndTime").value
+    };
+    state.reminders={
+      enabled:$("notifyEnabled").checked,
+      transition:$("transitionNotify").checked,
+      time1:$("reminderTime1").value,
+      time2:$("reminderTime2").value
+    };
+    if(state.profile.birthMode==="auto"&&!state.profile.birthDate){
+      toast("မွေးသက္ကရာဇ် ထည့်ပါ"); return;
+    }
+    saveState(); renderAll(); switchPage("todayPage"); toast("ဆက်တင် သိမ်းပြီးပါပြီ");
+  };
+
+  $("saveRulesBtn").onclick=()=>{
+    document.querySelectorAll("[data-rule-card]").forEach(card=>{
+      const i=Number(card.dataset.ruleCard);
+      const get=f=>card.querySelector(`[data-field="${f}"]`).value.trim();
+      state.rules[i].title=TARA_NAMES[i];
+      state.rules[i].key=TARA_KEYS[i];
+      state.rules[i].meaning=get("meaning");
+      state.rules[i].actions=get("actions").split("\n").map(x=>x.trim()).filter(Boolean);
+      state.rules[i].chant=get("chant");
+      state.rules[i].caution=get("caution");
+      state.rules[i].tone=get("tone");
+    });
+    saveState(); renderAll(); toast("စည်းမျဉ်းများ သိမ်းပြီးပါပြီ");
+  };
+
+  $("resetRulesBtn").onclick=()=>{
+    if(!confirm("မိမိပြင်ထားသော စည်းမျဉ်းအားလုံးကို ဖျက်ပြီး မူလအတိုင်းပြန်ထားမလား?")) return;
+    state.rules=JSON.parse(JSON.stringify(DEFAULT_RULES));saveState();renderAll();toast("မူလစည်းမျဉ်း ပြန်ထားပြီးပါပြီ");
+  };
+
+  $("refreshBtn").onclick=()=>{renderAll();toast("လက်ရှိအချိန်ဖြင့် ပြန်တွက်ပြီးပါပြီ")};
+
+  $("copyBtn").onclick=async()=>{
+    const text=$("chantText").textContent;
+    try{await navigator.clipboard.writeText(text);toast("ရွတ်ဖတ်စာ ကူးယူပြီးပါပြီ")}
+    catch(e){fallbackCopy(text)}
+  };
+
+  function fallbackCopy(text){
+    const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();
+    document.execCommand("copy");t.remove();toast("ရွတ်ဖတ်စာ ကူးယူပြီးပါပြီ");
+  }
+
+  $("speakBtn").onclick=()=>{
+    if(!("speechSynthesis" in window)){toast("ဤဖုန်းတွင် အသံဖတ်စနစ် မရနိုင်ပါ");return}
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance($("chantText").textContent);
+    u.lang="my-MM";u.rate=.82;speechSynthesis.speak(u);
+    toast("မြန်မာအသံမတပ်ထားလျှင် အသံထွက်မမှန်နိုင်ပါ");
+  };
+
+  $("completeBtn").onclick=()=>{
+    const t=taraFor(effectiveBirthNak(),currentInfo().idx);
+    const key=completionKey(t.taraIdx,currentInfo().idx);
+    const c=state.completion[key]||{actions:[],chant:false};
+    c.chant=!c.chant;state.completion[key]=c;saveState();renderToday();
+  };
+
+  function toICSDate(d){
+    return `${d.getUTCFullYear()}${fmt2(d.getUTCMonth()+1)}${fmt2(d.getUTCDate())}T${fmt2(d.getUTCHours())}${fmt2(d.getUTCMinutes())}00Z`;
+  }
+
+  function icsEscape(value){
+    return String(value??"")
+      .replace(/\\/g,"\\\\")
+      .replace(/\r?\n/g,"\\n")
+      .replace(/,/g,"\\,")
+      .replace(/;/g,"\\;");
+  }
+
+  $("calendarBtn").onclick=()=>{
+    const windows=estimateWindows(30);
+    const stamp=toICSDate(new Date());
+    const lines=[
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "CALSCALE:GREGORIAN",
+      "METHOD:PUBLISH",
+      "PRODID:-//San Yin Nakhat Reminder//MY",
+      "X-WR-CALNAME:စန်းယှဉ်နက္ခတ် Reminder"
+    ];
+
+    windows.forEach((w,i)=>{
+      const summary=`${NAKS[w.idx]}နက္ခတ် · ${w.tara.rule.title}`;
+      const description=[
+        `လက်ရှိစန်းယှဉ်နက္ခတ် — ${NAKS[w.idx]}`,
+        `တာရာ — ${w.tara.rule.title}`,
+        `အဝတ်အစားအသစ်ဝတ်ဆင်ခြင်း — ${CLOTHING_RESULTS[w.idx]}`,
+        "App ကိုဖွင့်၍ ရွတ်ဖတ်ရန်နှင့် ဆောင်ရွက်ရန်ကို စစ်ဆေးပါ။"
+      ].join("\\n");
+      lines.push(
+        "BEGIN:VEVENT",
+        `UID:${Date.now()}-${i}-${w.idx}@sanyin.local`,
+        `DTSTAMP:${stamp}`,
+        `DTSTART:${toICSDate(w.start)}`,
+        `DTEND:${toICSDate(w.end)}`,
+        `SUMMARY:${icsEscape(summary)}`,
+        `DESCRIPTION:${icsEscape(description)}`,
+        "BEGIN:VALARM",
+        "TRIGGER:-PT5M",
+        "ACTION:DISPLAY",
+        `DESCRIPTION:${icsEscape(summary)}`,
+        "END:VALARM",
+        "END:VEVENT"
+      );
+    });
+
+    lines.push("END:VCALENDAR");
+    downloadBlob(
+      new Blob([lines.join("\r\n")],{type:"text/calendar;charset=utf-8"}),
+      "san-yin-nakhat-30-events.ics"
+    );
+    toast("နက္ခတ်အမည်ပါ Calendar ၃၀ အလှည့် ထုတ်ပြီးပါပြီ");
+  };
+
+  function downloadBlob(blob,name){
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
+
+  $("permissionBtn").onclick=async()=>{
+    if(!("Notification" in window)){toast("ဤ browser တွင် Notification မရပါ");return}
+    try{
+      const p=await Notification.requestPermission();
+      toast(p==="granted"?"Notification ခွင့်ပြုပြီးပါပြီ":"Notification ခွင့်မပြုရသေးပါ");
+    }catch(e){toast("Notification ခွင့်တောင်း၍ မရပါ")}
+  };
+
+  function notify(title,body){
+    if(!state.reminders.enabled||!("Notification" in window)||Notification.permission!=="granted")return;
+    try{new Notification(title,{body,tag:"san-yin-nakhat",renotify:true})}catch(e){}
+  }
+
+  function clearTimers(){timers.forEach(clearTimeout);timers=[]}
+
+  function scheduleAtTime(time,kind){
+    if(!time)return;
+    const [h,m]=time.split(":").map(Number);
+    const d=new Date();d.setHours(h,m,0,0);if(d<=new Date())d.setDate(d.getDate()+1);
+    const ms=d-new Date();
+    const id=setTimeout(()=>{
+      const ci=currentInfo(),t=taraFor(effectiveBirthNak(),ci.idx);
+      notify(`စန်းယှဉ်နက္ခတ် — ${NAKS[ci.idx]}`,`${t.rule.title} · အဝတ်အစားအသစ်ဝတ်ဆင်ခြင်း — ${CLOTHING_RESULTS[ci.idx]}`);
+      scheduleNotifications();
+    },ms);
+    timers.push(id);
+  }
+
+  function scheduleNotifications(){
+    clearTimers();
+    if(!state.reminders.enabled)return;
+    scheduleAtTime(state.reminders.time1,"daily");
+    scheduleAtTime(state.reminders.time2,"daily");
+    if(state.reminders.transition){
+      const ci=currentInfo();
+      const ms=ci.end-new Date();
+      if(ms>1000&&ms<48*3600000){
+        timers.push(setTimeout(()=>{
+          const ni=currentInfo(),t=taraFor(effectiveBirthNak(),ni.idx);
+          notify(`နက္ခတ်ပြောင်းပါပြီ — ${NAKS[ni.idx]}`,`${t.rule.title} · အဝတ်အစားအသစ်ဝတ်ဆင်ခြင်း — ${CLOTHING_RESULTS[ni.idx]}`);
+          renderAll();
+        },ms+1500));
+      }
+    }
+  }
+
+  $("exportBtn").onclick=()=>{
+    const data={app:"စန်းယှဉ်နက္ခတ် Reminder",version:2,exportedAt:new Date().toISOString(),state};
+    downloadBlob(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),`san-yin-backup-${Date.now()}.json`);
+  };
+  $("importBtn").onclick=()=>$("importFile").click();
+  $("importFile").onchange=async e=>{
+    const f=e.target.files[0];if(!f)return;
+    try{
+      const data=JSON.parse(await f.text());
+      const incoming=data.state||data;
+      if(!incoming.profile||!incoming.rules)throw new Error("invalid");
+      state={...defaultState(),...incoming};
+      saveState();renderAll();toast("Backup ပြန်သွင်းပြီးပါပြီ");
+    }catch(err){toast("Backup ဖိုင်မမှန်ပါ")}
+    e.target.value="";
+  };
+
+  $("startBtn").onclick=()=>{
+    const name=$("firstName").value.trim();
+    const birth=Number($("firstBirthNak").value);
+    if(!name){toast("အမည်ထည့်ပါ");return}
+    state.profile.name=name;state.profile.birthNak=birth;state.setup=true;saveState();
+    $("setupModal").classList.remove("show");renderAll();toast("စတင်အသုံးပြုနိုင်ပါပြီ");
+  };
+
+  function maybeShowSetup(){
+    if(!state.setup)$("setupModal").classList.add("show");
+  }
+
+  function cleanupOldCompletion(){
+    const keys=Object.keys(state.completion);
+    if(keys.length<100)return;
+    keys.slice(0,keys.length-60).forEach(k=>delete state.completion[k]);
+    saveState();
+  }
+
+  window.addEventListener("visibilitychange",()=>{if(!document.hidden)renderAll()});
+  setInterval(updateClock,1000);
+  setInterval(()=>{if(state.current.mode==="auto")renderToday()},60000);
+
+  window.sanYinApp = {
+    getState(){
+      return JSON.parse(JSON.stringify(state));
+    },
+    setState(nextState){
+      if(!nextState || typeof nextState !== "object") return;
+      const baseState=defaultState();
+      state={
+        ...baseState,
+        ...nextState,
+        profile:{...baseState.profile,...(nextState.profile||{})},
+        current:{...baseState.current,...(nextState.current||{})},
+        reminders:{...baseState.reminders,...(nextState.reminders||{})},
+        rules:Array.isArray(nextState.rules)&&nextState.rules.length===9
+          ? nextState.rules.map((r,i)=>({...r,key:TARA_KEYS[i],title:TARA_NAMES[i]}))
+          : baseState.rules,
+        completion:nextState.completion||{},
+        setup:nextState.setup!==false
+      };
+      localStorage.setItem(STORE_KEY,JSON.stringify(state));
+      renderAll();
+      $("setupModal").classList.remove("show");
+    }
+  };
+
+  cleanupOldCompletion();
+  renderAll();
+  updateClock();
+  maybeShowSetup();
+  window.dispatchEvent(new Event("sanYinAppReady"));
+})();
+</script>
+  <script type="module" src="./firebase-app.js"></script>
+</body>
+</html>
